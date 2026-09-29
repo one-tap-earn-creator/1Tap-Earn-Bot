@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1Tap Earn - Official Eco-system</title>
+    <script src="https://telegram.org"></script>
+    <script src="https://adsgram.ai"></script>
+    
+    <!-- फायरबेस डेटाबेस की आधिकारिक स्क्रिप्ट्स (100% सुरक्षित) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b0f19; color: #ffffff; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 100vh; }
+        .header { width: 100%; display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; font-size: 14px; }
+        .score-container { margin-top: 40px; }
+        .score-value { font-size: 48px; font-weight: 800; color: #ffcc00; margin: 5px 0; }
+        .score-title { font-size: 16px; color: #8a99ad; letter-spacing: 1px; }
+        .game-area { margin: 30px 0; }
+        .circle-btn { width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, #2563eb 0%, #1d4ed8 100%); border: 8px solid rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(37,99,235,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; transition: transform 0.05s; }
+        .circle-btn:active { transform: scale(0.95); }
+        .circle-btn:disabled { background: #374151; box-shadow: none; border-color: #4b5563; cursor: not-allowed; }
+        .progress-container { width: 80%; max-width: 300px; background: #1f2937; height: 14px; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.1s; }
+        .energy-text { font-size: 14px; color: #9ca3af; margin-top: 5px; }
+        .streak-btn { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>🔥 Streak: <span id="streakDays">0</span> Days</div>
+        <div>📺 Ads Watched: <span id="adCount">0</span></div>
+    </div>
+
+    <div class="score-container">
+        <div class="score-value" id="taps">0 / 200</div>
+        <div class="score-title">TAPS UNTIL NEXT LEVEL</div>
+    </div>
+
+    <div class="game-area">
+        <button class="circle-btn" id="tapBtn" onclick="handleTap()">1TAP</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div class="progress-container">
+            <div class="progress-bar" id="energyBar"></div>
+        </div>
+        <div class="energy-text">⚡ <span id="energyValue">1000</span> / 1000</div>
+        <button class="streak-btn" id="streakBtn" onclick="claimDailyReward()">🎁 Claim Daily Reward</button>
+    </div>
+
+    <script>
+        // 🚨 ध्यान दें: यहाँ आपको अपना वो बड़ा वाला Firebase Config कोड पेस्ट करना है!
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // फायरबेस इनिशियलाइज़ करें
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const userId = tg.initDataUnsafe?.user?.id || "guest_user"; // यूज़र की Telegram ID
+
+        let taps = 0;
+        let totalAds = 0;
+        let energy = 1000;
+        let maxEnergy = 1000;
+        let streak = 0;
+
+        // डेटाबेस से यूज़र का पुराना डेटा लोड करें
+        db.collection("users").doc(userId.toString()).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                totalAds = data.adsWatched || 0;
+                streak = data.streakDays || 0;
+                updateUI();
+            }
+        });
+
+        // Adsgram Setup (अपनी Adsgram ID यहाँ डालें)
+        const AdController = window.Adsgram.init({ blockId: "YOUR_ADSGRAM_BLOCK_ID" });
+
+        function handleTap() {
+            if (energy > 0 && taps < 200) {
+                taps++;
+                energy = energy - 5;
+                updateUI();
+
+                if (taps === 200) {
+                    document.getElementById('tapBtn').disabled = true;
+                    triggerAd();
+                }
+            }
+        }
+
+        function triggerAd() {
+            AdController.show().then(() => {
+                totalAds++;
+                taps = 0;
+                document.getElementById('tapBtn').disabled = false;
+                
+                // डेटाबेस में लाइव एड काउंट अपडेट करें
+                db.collection("users").doc(userId.toString()).set({
+                    adsWatched: totalAds,
+                    streakDays: streak,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                updateUI();
+            }).catch(() => {
+                alert("Please watch the full video to continue.");
+                document.getElementById('tapBtn').disabled = false;
+            });
+        }
+
+        // एनर्जी ऑटो-रीचार्ज सिस्टम
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy = Math.min(maxEnergy, energy + 2);
+                updateUI();
+            }
+        }, 1000);
+
+        function claimDailyReward() {
+            streak++;
+            document.getElementById('streakBtn').disabled = true;
+            document.getElementById('streakBtn').innerText = "✅ Claimed Today";
+            
+            db.collection("users").doc(userId.toString()).set({
+                streakDays: streak
+            }, { merge: true });
+
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('taps').innerText = taps + " / 200";
+            document.getElementById('adCount').innerText = totalAds;
+            document.getElementById('streakDays').innerText = streak;
+            document.getElementById('energyValue').innerText = energy;
+            let energyPercentage = (energy / maxEnergy) * 100;
+            document.getElementById('energyBar').style.width = energyPercentage + "%";
+        }
+    </script>
+</body>
+</html>
