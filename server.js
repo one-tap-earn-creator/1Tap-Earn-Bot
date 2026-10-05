@@ -1,51 +1,36 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyC5BFNF137Rx417aa28mGga4m47QvtOo9Y",
-  authDomain: "://firebaseapp.com",
-  projectId: "tap-earn-3e3e6",
-  storageBucket: "tap-earn-3e3e6.firebasestorage.app",
-  messagingSenderId: "737917962754",
-  appId: "1:737917962754:web:853f20037a6d9b0483351b"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const tg = window.Telegram.WebApp;
-tg.expand();
-const userId = tg.initDataUnsafe?.user?.id || "guest_user";
-let taps = 0, totalAds = 0, energy = 1000, maxEnergy = 1000, streak = 0;
+const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
+const app = express();
 
-db.collection("users").doc(userId.toString()).get().then((doc) => {
-    if (doc.exists) {
-        const data = doc.data();
-        totalAds = data.adsWatched || 0;
-        streak = data.streakDays || 0;
-        updateUI();
-    }
+// 1. Your official secure bot token configuration
+const token = '8996326854:AAHeSyx924AVhzi0KrLZKkhOYI2DkgQ5iKQ';
+const bot = new TelegramBot(token, { polling: true });
+
+// 2. Your 100% verified working permanent live game link on Tiiny Host
+const GAME_URL = 'https://tiiny.site';
+
+app.use(express.json());
+
+// Triggers seamlessly when a player types /start
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const opts = {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: '🎮 Play 1Tap Game',
+                        url: GAME_URL // Opens cleanly in default mobile apps/browser
+                    }
+                ]
+            ]
+        }
+    };
+    bot.sendMessage(chatId, '🚀 Welcome to the Official 1Tap Earn Eco-system!\n\nTap the button below to open the mining app, complete social tasks, and secure your rank directly on Telegram:', opts);
 });
-const AdController = window.Adsgram.init({ blockId: "3747" });
-function switchPage(pageName) {
-    if (pageName === 'home') {
-        document.getElementById('homePage').classList.add('active'); document.getElementById('tasksPage').classList.remove('active');
-    } else {
-        document.getElementById('homePage').classList.remove('active'); document.getElementById('tasksPage').classList.add('active');
-    }
-}
-function handleTap() {
-    if (totalAds >= 30) { alert("Daily limit reached!"); return; }
-    if (energy > 0 && taps < 50) { taps++; energy -= 10; updateUI(); if (taps === 50) { triggerAd(); } }
-}
-function triggerAd() {
-    AdController.show().then(() => {
-        totalAds++; taps = 0;
-        db.collection("users").doc(userId.toString()).set({ adsWatched: totalAds, streakDays: streak }, { merge: true });
-        updateUI();
-    });
-}
-function openSocial(type) {
-    let url = type === 'youtube' ? "https://youtube.com" : (type === 'instagram' ? "https://instagram.com" : "https://t.me");
-    tg.openLink(url);
-}
-setInterval(() => { if (energy < maxEnergy) { energy = Math.min(maxEnergy, energy + 5); updateUI(); } }, 1000);
-function updateUI() {
-    document.getElementById('taps').innerText = taps + " / 50";
-    document.getElementById('adCount').innerText = totalAds + " / 30";
-}
+
+// Port engine keeping the system running 24/7 on free tiers
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
