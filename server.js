@@ -6,8 +6,8 @@ const app = express();
 const token = '8996326854:AAE3juI3rtUNt9_8Plg0SAARO5cwUSRRru8';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. Your actual running game link from your CodePen Project
-const GAME_URL = 'https://codepen.dev';
+// 2. Your permanent running game link on Tiiny Host
+const GAME_URL = 'https://tiiny.site';
 
 app.use(express.json());
 
@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
                 [
                     {
                         text: '🎮 Play 1Tap Game',
-                        url: GAME_URL // 🌟 यहाँ बदलाव किया है: यह गेम को सीधे ब्राउज़र में 100% सफलता के साथ खोलेगा
+                        url: GAME_URL // Directly opens in browser with 100% success rate
                     }
                 ]
             ]
