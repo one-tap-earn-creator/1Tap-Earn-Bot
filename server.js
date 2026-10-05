@@ -2,8 +2,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const app = express();
 
-// 1. Your official secure bot token configuration
-const token = '8996326854:AAE3juI3rtUNt9_8Plg0SAARO5cwUSRRru8';
+// 1. Your brand new secure bot token configuration
+const token = '8996326854:AAHeSyx924AVhzi0KrLZKkhOYI2DkgQ5iKQ';
 const bot = new TelegramBot(token, { polling: true });
 
 // 2. Your 100% verified working permanent live game link on Tiiny Host
