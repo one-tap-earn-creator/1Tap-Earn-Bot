@@ -6,7 +6,7 @@ const app = express();
 const token = '8996326854:AAE3juI3rtUNt9_8Plg0SAARO5cwUSRRru8';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. Your exact running production game link on Vercel
+// 2. Your permanent static game link on Vercel
 const VERCEL_URL = 'https://vercel.app';
 
 app.use(express.json());
@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
                 [
                     {
                         text: '🎮 Play 1Tap Game',
-                        web_app: { url: VERCEL_URL }
+                        url: VERCEL_URL // Directly opens in browser with 100% success rate
                     }
                 ]
             ]
