@@ -6,7 +6,7 @@ const app = express();
 const token = '8996326854:AAE3juI3rtUNt9_8Plg0SAARO5cwUSRRru8';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. Automatically picks up your live web app destination
+// 2. Your actual running game link on Vercel
 const VERCEL_URL = 'https://vercel.app';
 
 app.use(express.json());
@@ -34,4 +34,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
