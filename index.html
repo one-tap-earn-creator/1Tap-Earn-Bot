@@ -1,51 +1,46 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyC5BFNF137Rx417aa28mGga4m47QvtOo9Y",
-  authDomain: "://firebaseapp.com",
-  projectId: "tap-earn-3e3e6",
-  storageBucket: "tap-earn-3e3e6.firebasestorage.app",
-  messagingSenderId: "737917962754",
-  appId: "1:737917962754:web:853f20037a6d9b0483351b"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const tg = window.Telegram.WebApp;
-tg.expand();
-const userId = tg.initDataUnsafe?.user?.id || "guest_user";
-let taps = 0, totalAds = 0, energy = 1000, maxEnergy = 1000, streak = 0;
-
-db.collection("users").doc(userId.toString()).get().then((doc) => {
-    if (doc.exists) {
-        const data = doc.data();
-        totalAds = data.adsWatched || 0;
-        streak = data.streakDays || 0;
-        updateUI();
-    }
-});
-const AdController = window.Adsgram.init({ blockId: "3747" });
-function switchPage(pageName) {
-    if (pageName === 'home') {
-        document.getElementById('homePage').classList.add('active'); document.getElementById('tasksPage').classList.remove('active');
-    } else {
-        document.getElementById('homePage').classList.remove('active'); document.getElementById('tasksPage').classList.add('active');
-    }
-}
-function handleTap() {
-    if (totalAds >= 30) { alert("Daily limit reached!"); return; }
-    if (energy > 0 && taps < 50) { taps++; energy -= 10; updateUI(); if (taps === 50) { triggerAd(); } }
-}
-function triggerAd() {
-    AdController.show().then(() => {
-        totalAds++; taps = 0;
-        db.collection("users").doc(userId.toString()).set({ adsWatched: totalAds, streakDays: streak }, { merge: true });
-        updateUI();
-    });
-}
-function openSocial(type) {
-    let url = type === 'youtube' ? "https://youtube.com" : "https://instagram.com";
-    tg.openLink(url);
-}
-setInterval(() => { if (energy < maxEnergy) { energy = Math.min(maxEnergy, energy + 5); updateUI(); } }, 1000);
-function updateUI() {
-    document.getElementById('taps').innerText = taps + " / 50";
-    document.getElementById('adCount').innerText = totalAds + " / 30";
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1Tap Earn - Premium Mini App</title>
+    <script src="https://telegram.org"></script>
+    <script src="https://adsgram.ai"></script>
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="homePage" class="page active">
+        <div class="header">
+            <div>🔥 Streak: <span id="streakDays">0</span> Days</div>
+            <div>📺 Today's Ads: <span id="adCount">0 / 30</span></div>
+        </div>
+        <div class="score-container">
+            <div class="score-value" id="taps">0 / 50</div>
+            <div class="score-title">TAPS UNTIL NEXT AD</div>
+        </div>
+        <div class="game-area">
+            <button class="circle-btn" id="tapBtn" onclick="handleTap()">T</button>
+        </div>
+        <div class="progress-section">
+            <div class="progress-container"><div class="progress-bar" id="energyBar"></div></div>
+            <div class="energy-text">⚡ <span id="energyValue">1000</span> / 1000</div>
+            <button class="streak-btn" id="streakBtn" onclick="claimDailyReward()">🎁 Claim Daily Reward</button>
+        </div>
+    </div>
+    <div id="tasksPage" class="page">
+        <div class="tasks-container">
+            <h3>🚀 Official Social Tasks</h3>
+            <div class="task-row"><span>📸 Follow Instagram (+25 Taps)</span><button class="task-btn" onclick="openSocial('instagram')">Follow</button></div>
+            <div class="task-row"><span>📺 Subscribe YouTube (+25 Taps)</span><button class="task-btn" onclick="openSocial('youtube')">Join</button></div>
+            <div class="task-row"><span>📢 Join Telegram Channel (+25 Taps)</span><button class="task-btn" onclick="openSocial('telegram')">Join</button></div>
+        </div>
+    </div>
+    <div class="nav-bar">
+        <button class="nav-item active" id="homeTab" onclick="switchPage('home')"><span>🏠</span><br>Home</button>
+        <button class="nav-item" id="tasksTab" onclick="switchPage('tasks')"><span>🚀</span><br>Tasks</button>
+    </div>
+    <script src="./script.js"></script>
+</body>
+</html>
