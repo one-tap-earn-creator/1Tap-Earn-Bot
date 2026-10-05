@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
                 [
                     {
                         text: '🎮 Play 1Tap Game',
-                        url: GAME_URL // Directly opens in browser with 100% success rate
+                        url: GAME_URL // 🌟 यहाँ बदलाव किया है: यह गेम को सीधे ब्राउज़र में 100% सफलता के साथ खोलेगा
                     }
                 ]
             ]
