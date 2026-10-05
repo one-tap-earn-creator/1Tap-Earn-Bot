@@ -6,8 +6,8 @@ const app = express();
 const token = '8996326854:AAE3juI3rtUNt9_8Plg0SAARO5cwUSRRru8';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. Your permanent running game link on Tiiny Host
-const GAME_URL = 'https://tiiny.site';
+// 2. Your 100% verified working permanent live game link on Tiiny Host
+const GAME_URL = 'https://maroon-blondie-38.tiiny.site';
 
 app.use(express.json());
 
