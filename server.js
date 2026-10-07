@@ -2,11 +2,11 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const app = express();
 
-// 1. Your official secure bot token configuration
-const token = '8996326854:AAHeSyx924AVhzi0KrLZKkhOYI2DkgQ5iKQ';
+// 1. Your brand new secure bot token configuration
+const token = '8996326854:AAEW0rKdOmbSHITT2rXj6LbhipdhwuwED7g';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. 100% Permanent Static Link on GitHub Pages (No expiry, directly opens your game)
+// 2. 100% Permanent Static Link on GitHub Pages (Directly opens your game)
 const GAME_URL = 'https://github.io';
 
 app.use(express.json());
@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
                 [
                     {
                         text: '🎮 Play 1Tap Game',
-                        url: GAME_URL // Directly opens your real 'T' coin game with 100% success rate
+                        url: GAME_URL // Opens your real 'T' coin game with 100% success rate
                     }
                 ]
             ]
